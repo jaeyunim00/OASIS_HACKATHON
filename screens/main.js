@@ -7,23 +7,16 @@ import * as Location from "expo-location";
 function MainScreen() {
   //고정 마커
   const [initialRegion, setInitialRegion] = useState(null);
-
-  //로딩
   const [loading, setLoading] = useState(true);
-
   //내 위치
   const [currentLocation, setCurrentLocation] = useState(null);
-
   //필터링
   const [toiletLocations, setToiletLocations] = useState([]);
   const [showToilets, setShowToilets] = useState(false);
-
   //현재 화면 뷰포트
   const [viewPort, setViewport] = useState(null);
-
   //나와 마커사이의 거리
   const [distanceToMarker, setDistanceToMarker] = useState(null);
-  const [selectedMarkerIndex, setSelectedMarkerIndex] = useState(null);
 
   //고정마커
   useEffect(() => {
@@ -99,21 +92,36 @@ function MainScreen() {
     );
   }
 
+  //markers 업데이트
   const user_marker_image = require("../assets/user_marker.png");
-  console.log(distanceToMarker);
-  const markers = [
-    {
-      title: "My Location",
-      description: "This is my current location",
-      coordinate: {
-        latitude: currentLocation.latitude,
-        longitude: currentLocation.longitude,
-      },
-      image: user_marker_image,
+
+  const userMarker = {
+    title: "My Location",
+    description: "This is my current location",
+    coordinate: {
+      latitude: currentLocation.latitude,
+      longitude: currentLocation.longitude,
     },
+    image: user_marker_image,
+  };
+
+  const parks = [
+    {
+      name: "풍암저수지",
+      latitude: 35,
+      longitude: 126,
+    },
+    {
+      name: "운천저수지",
+      latitude: 33,
+      longitude: 116,
+    },
+  ];
+
+  const parkMarkers = [
     //주변에있는 공원 마커 database에서 추가.
     {
-      title: "공원 고정 1",
+      title: "a",
       description: "X",
       coordinate: {
         latitude: 35.125,
@@ -176,7 +184,19 @@ function MainScreen() {
           initialRegion={initialRegion}
           onRegionChangeComplete={(newRegion) => setViewport(newRegion)}
         >
-          {markers.map((marker, index) => (
+          //사용자 마커
+          <Marker
+            key={"user-0"}
+            coordinate={userMarker.coordinate}
+            title={userMarker.title}
+            image={userMarker.image}
+            style={{
+              width: 10,
+              height: 10,
+            }}
+          />
+          //공원 마커
+          {parkMarkers.map((marker, index) => (
             <Marker
               key={index}
               coordinate={marker.coordinate}
@@ -184,7 +204,6 @@ function MainScreen() {
               description={
                 marker.distance ? marker.distance : marker.description
               }
-              image={marker.image}
               style={{
                 width: 10,
                 height: 10,
