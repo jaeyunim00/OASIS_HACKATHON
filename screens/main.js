@@ -1,24 +1,38 @@
 import React, { useEffect, useState } from "react";
 
-import { View, Text, ActivityIndicator, Button } from "react-native";
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  Button,
+  TouchableOpacity,
+  Modal,
+} from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 
+import parkMarkers from "../components/marker";
+
 function MainScreen() {
-  //고정 마커
+  //초기위치설정(내 위치), 로딩관리
   const [initialRegion, setInitialRegion] = useState(null);
   const [loading, setLoading] = useState(true);
-  //내 위치
+
+  //실시간 내 위치
+  const user_marker_image = require("../assets/user_marker.png");
   const [currentLocation, setCurrentLocation] = useState(null);
-  //필터링
-  const [toiletLocations, setToiletLocations] = useState([]);
-  const [showToilets, setShowToilets] = useState(false);
+
   //현재 화면 뷰포트
   const [viewPort, setViewport] = useState(null);
+
   //나와 마커사이의 거리
   const [distanceToMarker, setDistanceToMarker] = useState(null);
 
-  //고정마커
+  //모달창
+  const [selectedMarker, setSelectedMarker] = useState(null);
+  const [isPopupVisible, setPopupVisible] = useState(false);
+
+  //초기위치설정, 로딩관리
   useEffect(() => {
     async function fetchInitialLocation() {
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -52,37 +66,7 @@ function MainScreen() {
     fetchCurrentLocation();
   }, []);
 
-  //화장실 가져오기
-  useEffect(() => {
-    async function fetchToiletLocations() {
-      // Use Google Maps Places API to fetch toilet locations
-      const apiKey = "AIzaSyB5vkO74FzMb8CgWtKlOJYriyOoTeeQKtQ";
-
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${currentLocation.latitude},${currentLocation.longitude}&radius=500&type=toilet&key=AIzaSyB5vkO74FzMb8CgWtKlOJYriyOoTeeQKtQ`
-      );
-      const data = await response.json();
-      const toiletLocations = data.results.map((result) => ({
-        title: result.name,
-        description: result.vicinity,
-        coordinate: {
-          latitude: result.geometry.location.lat,
-          longitude: result.geometry.location.lng,
-        },
-      }));
-      setToiletLocations(toiletLocations);
-    }
-    if (initialRegion) {
-      fetchToiletLocations();
-    }
-  }, [initialRegion]);
-
-  function handleToiletBtnClick() {
-    setShowToilets(!showToilets);
-  }
-
-  //초기 지역설정이 되지 않은 시점에서는 아무 표시(마커) 않하게. (비동기처리)
-  //로딩 설정
+  //이 위치는 useEffect가 끝난뒤 와야함.
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -91,9 +75,6 @@ function MainScreen() {
       </View>
     );
   }
-
-  //markers 업데이트
-  const user_marker_image = require("../assets/user_marker.png");
 
   const userMarker = {
     title: "My Location",
@@ -105,50 +86,7 @@ function MainScreen() {
     image: user_marker_image,
   };
 
-  const parks = [
-    {
-      name: "풍암저수지",
-      latitude: 35,
-      longitude: 126,
-    },
-    {
-      name: "운천저수지",
-      latitude: 33,
-      longitude: 116,
-    },
-  ];
-
-  const parkMarkers = [
-    //주변에있는 공원 마커 database에서 추가.
-    {
-      title: "a",
-      description: "X",
-      coordinate: {
-        latitude: 35.125,
-        longitude: 126.875,
-      },
-    },
-    {
-      title: "공원 고정 2",
-      description: "X",
-      coordinate: {
-        latitude: 35.126,
-        longitude: 126.88,
-      },
-    },
-    {
-      title: "공원 고정 3",
-      description: "X",
-      coordinate: {
-        latitude: 35.12,
-        longitude: 126.885,
-      },
-    },
-  ];
-
-  const handleMarkerPress = (marker, index) => {
-    setSelectedMarkerIndex(index);
-
+  const handleMarkerPress = (marker) => {
     if (currentLocation && marker) {
       const R = 6371; // Earth's radius in km
       const lat1 = currentLocation.latitude;
@@ -173,18 +111,30 @@ function MainScreen() {
     } else {
       setDistanceToMarker(null); // Reset distance when no marker is selected
     }
+
+    setSelectedMarker(marker);
+    setPopupVisible(true);
+  };
+
+  const handleClosePopup = () => {
+    setSelectedMarker(null);
+    setPopupVisible(false);
   };
 
   return (
     <View style={{ flex: 1 }}>
-      <Button title="화장실 표시" onPress={handleToiletBtnClick}></Button>
+      {distanceToMarker && (
+        <Text style={{ textAlign: "center", height: 50, fontSize: 30 }}>
+          공원까지의 거리 : {distanceToMarker}
+        </Text>
+      )}
       {initialRegion && (
         <MapView
           style={{ flex: 1 }}
           initialRegion={initialRegion}
           onRegionChangeComplete={(newRegion) => setViewport(newRegion)}
         >
-          //사용자 마커
+          {/* {사용자 마커} */}
           <Marker
             key={"user-0"}
             coordinate={userMarker.coordinate}
@@ -195,7 +145,7 @@ function MainScreen() {
               height: 10,
             }}
           />
-          //공원 마커
+          {/* {공원 마커} */}
           {parkMarkers.map((marker, index) => (
             <Marker
               key={index}
@@ -208,29 +158,32 @@ function MainScreen() {
                 width: 10,
                 height: 10,
               }}
-              onPress={() => handleMarkerPress(marker, index)}
+              onPress={() => handleMarkerPress(marker)}
             />
           ))}
-          {toiletLocations.map((toilet, index) => {
-            if (!showToilets) {
-              return null;
-            }
-            return (
-              <Marker
-                key={index}
-                coordinate={toilet.coordinate}
-                title={toilet.title}
-                description={toilet.description}
-              />
-            );
-          })}
         </MapView>
       )}
-      {distanceToMarker && (
-        <Text style={{ textAlign: "center", height: 50, fontSize: 30 }}>
-          공원까지의 거리 : {distanceToMarker}
-        </Text>
-      )}
+      {/* Use Modal from React Native */}
+      <Modal
+        visible={isPopupVisible}
+        animationType="slide" // Slide in from the bottom
+        transparent={true}
+        onRequestClose={() => setPopupVisible(false)}
+        backdropOpacity={0.5}
+        backdropTouchable={true}
+        animationIn="slideInUp"
+        animationOut="slideOutDown"
+      >
+        <View style={{ flex: 1, justifyContent: "flex-end" }}>
+          <View style={{ flex: 0.5, backgroundColor: "white", padding: 20 }}>
+            <Text>{selectedMarker && selectedMarker.title}</Text>
+            <Text>{selectedMarker && selectedMarker.description}</Text>
+            <TouchableOpacity onPress={() => setPopupVisible(false)}>
+              <Text>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
