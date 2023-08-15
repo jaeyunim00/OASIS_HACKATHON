@@ -7,11 +7,14 @@ import {
   Button,
   TouchableOpacity,
   Modal,
+  TouchableWithoutFeedback,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 
 import parkMarkers from "../components/marker";
+
+import parks from "../data/parks";
 
 function MainScreen() {
   //초기위치설정(내 위치), 로딩관리
@@ -31,6 +34,10 @@ function MainScreen() {
   //모달창
   const [selectedMarker, setSelectedMarker] = useState(null);
   const [isPopupVisible, setPopupVisible] = useState(false);
+
+  const selectedPark = selectedMarker
+    ? parks.find((park) => park.name === selectedMarker.title)
+    : null;
 
   //초기위치설정, 로딩관리
   useEffect(() => {
@@ -116,11 +123,6 @@ function MainScreen() {
     setPopupVisible(true);
   };
 
-  const handleClosePopup = () => {
-    setSelectedMarker(null);
-    setPopupVisible(false);
-  };
-
   return (
     <View style={{ flex: 1 }}>
       {distanceToMarker && (
@@ -168,21 +170,27 @@ function MainScreen() {
         visible={isPopupVisible}
         animationType="slide" // Slide in from the bottom
         transparent={true}
-        onRequestClose={() => setPopupVisible(false)}
-        backdropOpacity={0.5}
-        backdropTouchable={true}
-        animationIn="slideInUp"
-        animationOut="slideOutDown"
       >
-        <View style={{ flex: 1, justifyContent: "flex-end" }}>
-          <View style={{ flex: 0.5, backgroundColor: "white", padding: 20 }}>
-            <Text>{selectedMarker && selectedMarker.title}</Text>
-            <Text>{selectedMarker && selectedMarker.description}</Text>
-            <TouchableOpacity onPress={() => setPopupVisible(false)}>
-              <Text>Close</Text>
-            </TouchableOpacity>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            setPopupVisible(false);
+          }}
+        >
+          <View style={{ flex: 1, justifyContent: "flex-end" }}>
+            <View style={{ flex: 0.5, backgroundColor: "white", padding: 20 }}>
+              {selectedPark && (
+                <>
+                  <Text>{selectedPark.name}</Text>
+                  <Text>{selectedPark.type}</Text>
+                  {/* Add other park information as needed */}
+                  <TouchableOpacity onPress={() => setPopupVisible(false)}>
+                    <Text>Close</Text>
+                  </TouchableOpacity>
+                </>
+              )}
+            </View>
           </View>
-        </View>
+        </TouchableWithoutFeedback>
       </Modal>
     </View>
   );
