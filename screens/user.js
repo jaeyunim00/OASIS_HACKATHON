@@ -8,7 +8,7 @@ import {
   Image,
   Alert,
 } from "react-native";
-import { auth, signin } from "../firbaseConfig";
+import { auth, signin } from "../firebaseConfig";
 import { useNavigation } from "@react-navigation/native";
 import LoginImage from "../assets/logo_img.png"; // 이미지 경로 수정
 
