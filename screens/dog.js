@@ -2,12 +2,13 @@ import React, { useState, useEffect } from "react";
 import { View, Text, Image, StyleSheet, Button } from "react-native";
 import { getFirestore, collection, getDocs } from "@firebase/firestore";
 import { initializeApp } from "firebase/app";
-import { db } from "../firebaseConfig";
+import { db, auth } from "../firebaseConfig";
 
 function DogScreen() {
   const [level, setLevel] = useState(1);
   const [experience, setExperience] = useState(0);
   const maxExperience = 100; // 최대 경험치 값
+  const [user, setUser] = useState(null);
 
   const [exp, setExp] = useState([]);
 
@@ -17,7 +18,7 @@ function DogScreen() {
   };
 
   const fetchDogs = async () => {
-    const dogCollectionRef = collection(db, "dog");
+    const dogCollectionRef = collection(db, "users");
     const querySnapshot = await getDocs(dogCollectionRef);
 
     const dogList = [];

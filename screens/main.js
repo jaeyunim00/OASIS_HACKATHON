@@ -44,6 +44,17 @@ function MainScreen() {
     ? parks.find((park) => park.name === selectedMarker.title)
     : null;
 
+  const handleGoToUserLocation = () => {
+    if (currentLocation) {
+      // 현재 위치로 지도 중심 이동
+      setViewport({
+        latitude: currentLocation.latitude,
+        longitude: currentLocation.longitude,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421,
+      });
+    }
+  };
   //초기위치설정, 로딩관리
   useEffect(() => {
     async function fetchInitialLocation() {
@@ -240,23 +251,28 @@ function MainScreen() {
                         {selectedPark.address}
                       </Text>
                     </View>
-                    <TouchableOpacity
-                      onPress={() => {
-                        // 예를 들어 웹 브라우저로 URL 열기 등을 구현합니다.
-                        Linking.openURL(selectedPark.detail).catch((error) =>
-                          console.error("An error occurred", error)
-                        );
-                      }}
-                      style={styles.line_3}
-                    >
-                      <Icon
-                        name="angle-double-right"
-                        size={20}
-                        color="#487548"
-                        style={{ marginRight: 5 }}
-                      />
-                      <Text style={styles.hyperlinkText}>자세히</Text>
-                    </TouchableOpacity>
+                    <View style={styles.line_3}>
+                      <TouchableOpacity
+                        onPress={() => {
+                          // 예를 들어 웹 브라우저로 URL 열기 등을 구현합니다.
+                          Linking.openURL(selectedPark.detail).catch((error) =>
+                            console.error("An error occurred", error)
+                          );
+                        }}
+                        style={styles.line_3}
+                      >
+                        <Icon
+                          name="angle-double-right"
+                          size={20}
+                          color="#487548"
+                          style={{ marginRight: 5 }}
+                        />
+                        <Text style={styles.hyperlinkText}>자세히</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity>
+                        <Text style={styles.hyperlinkText}>주변시설정보</Text>
+                      </TouchableOpacity>
+                    </View>
                     {/* Add other park information as needed */}
                   </View>
                 )}
@@ -326,7 +342,7 @@ const styles = StyleSheet.create({
   line_3: {
     marginTop: -7,
     flexDirection: "row",
-    justifyContent: "flex-end",
+    justifyContent: "space-between",
     alignItems: "center",
   },
 });

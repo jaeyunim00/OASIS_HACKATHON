@@ -5,6 +5,7 @@ import {
   signInWithEmailAndPassword as signin,
 } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { addDoc, collection } from "firebase/firestore";
 const firebaseConfig = {
   apiKey: "AIzaSyBqdA8pRCzNFqTvi1vdkJVWyak9ZWkGuHw",
   authDomain: "test-91df1.firebaseapp.com",
@@ -19,4 +20,4 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app); // Initialize auth object
 const db = getFirestore(app); // Initialize firestore object
 
-export { auth, createUser, signin, db };
+export { auth, createUser, signin, db, addDoc, collection };
