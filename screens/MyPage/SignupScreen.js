@@ -30,14 +30,14 @@ export default function SignupScreen() {
         email: user.email,
         name: name,
         address: address,
-        point: "0",
+        exp: 0,
       };
 
       const docRef = await addDoc(collection(db, "users"), userInfo);
       console.log("Document written with ID: ", docRef.id);
 
       // Additional actions on successful signup
-      navigation.navigate("공원");
+      navigation.navigate("Main");
     } catch (error) {
       console.error("Signup Error", error);
       // Handle signup failure

@@ -15,13 +15,14 @@ import {
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
-
+import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/FontAwesome";
 
 import parkMarkers from "../components/marker";
 import parks from "../data/parks";
 
 function MainScreen() {
+  const navigation = useNavigation();
   //초기위치설정(내 위치), 로딩관리
   const [initialRegion, setInitialRegion] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -137,6 +138,11 @@ function MainScreen() {
 
     setSelectedMarker(marker);
     setPopupVisible(true);
+  };
+
+  const handleFacility = () => {
+    setPopupVisible(false);
+    navigation.navigate("Facility");
   };
 
   return (
@@ -269,7 +275,7 @@ function MainScreen() {
                         />
                         <Text style={styles.hyperlinkText}>자세히</Text>
                       </TouchableOpacity>
-                      <TouchableOpacity>
+                      <TouchableOpacity onPress={handleFacility}>
                         <Text style={styles.hyperlinkText}>주변시설정보</Text>
                       </TouchableOpacity>
                     </View>

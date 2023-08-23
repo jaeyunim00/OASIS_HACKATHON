@@ -11,6 +11,7 @@ import {
 import { auth, signin } from "../../firebaseConfig";
 import { useNavigation } from "@react-navigation/native";
 import LoginImage from "../../assets/logo_img.png"; // 이미지 경로 수정
+import { CommonActions } from "@react-navigation/native";
 
 import { useAuth } from "../../AuthContext";
 
@@ -27,7 +28,12 @@ export default function LoginScreen() {
       .then((userCredential) => {
         const user = userCredential.user;
         handleLoggedin(user.email); // 사용자 정보도 함께 저장
-        navigation.navigate("공원");
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: "공원" }], // 초기화하고 싶은 화면 이름으로 변경
+          })
+        );
       })
       .catch((error) => {
         Alert.alert("Login Failed", error.message);

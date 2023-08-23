@@ -13,6 +13,7 @@ import LoginScreen from "./screens/MyPage/LoginScreen";
 import SignupScreen from "./screens/MyPage/SignupScreen";
 import LoggedInMyPage from "./screens/MyPage/LoggedInMyPage";
 import LoggedOutMyPage from "./screens/MyPage/LoggedOutMyPage";
+import FacilityScreen from "./screens/Facility/FacilityScreen";
 
 import { AuthProvider, useAuth } from "./AuthContext";
 
@@ -61,7 +62,6 @@ export default function App() {
         >
           <Tab.Screen
             name="공원"
-            component={MainScreen}
             initialRouteName="Main"
             options={{
               headerShown: false,
@@ -69,7 +69,22 @@ export default function App() {
                 <TabBarIcon focused={focused} iconName="홈" />
               ),
             }}
-          />
+          >
+            {() => (
+              <Stack.Navigator>
+                <Stack.Screen
+                  name="MainPage"
+                  component={MainScreen}
+                  // options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="Facility"
+                  component={FacilityScreen}
+                  // options={{ headerShown: false }}
+                />
+              </Stack.Navigator>
+            )}
+          </Tab.Screen>
           <Tab.Screen
             name="스토리"
             component={StoryScreen}
@@ -103,7 +118,7 @@ export default function App() {
           <Tab.Screen
             name="내 정보"
             options={{
-              headerShown: false,
+              // headerShown: false,
               tabBarIcon: ({ focused }) => (
                 <TabBarIcon focused={focused} iconName="마이" />
               ),
@@ -114,27 +129,27 @@ export default function App() {
                 <Stack.Screen
                   name="MyPage"
                   component={MyPageScreen}
-                  options={{ headerShown: false }}
+                  // options={{ headerShown: false }}
                 />
                 <Stack.Screen
                   name="Login"
                   component={LoginScreen}
-                  options={{ headerShown: false }}
+                  // options={{ headerShown: false }}
                 />
                 <Stack.Screen
                   name="Signup"
                   component={SignupScreen}
-                  options={{ headerShown: false }}
+                  // options={{ headerShown: false }}
                 />
                 <Stack.Screen
                   name="LoggedInMyPage"
                   component={LoggedInMyPage}
-                  options={{ headerShown: false }}
+                  // options={{ headerShown: false }}
                 />
                 <Stack.Screen
                   name="LoggedOutMyPage"
                   component={LoggedOutMyPage}
-                  options={{ headerShown: false }}
+                  // options={{ headerShown: false }}
                 />
               </Stack.Navigator>
             )}
