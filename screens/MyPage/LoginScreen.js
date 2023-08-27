@@ -23,8 +23,8 @@ export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = () => {
-    signin(auth, email, password)
+  const handleLogin = async () => {
+    await signin(auth, email, password)
       .then((userCredential) => {
         const user = userCredential.user;
         handleLoggedin(user.email); // 사용자 정보도 함께 저장

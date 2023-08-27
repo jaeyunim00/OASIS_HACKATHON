@@ -7,13 +7,15 @@ import { TouchableOpacity, Image } from "react-native";
 import DogScreen from "./screens/dog";
 import MainScreen from "./screens/main";
 import ComplainScreen from "./screens/complain";
-import StoryScreen from "./screens/story";
 import MyPageScreen from "./screens/MyPage/MyPageScreen";
 import LoginScreen from "./screens/MyPage/LoginScreen";
 import SignupScreen from "./screens/MyPage/SignupScreen";
 import LoggedInMyPage from "./screens/MyPage/LoggedInMyPage";
 import LoggedOutMyPage from "./screens/MyPage/LoggedOutMyPage";
 import FacilityScreen from "./screens/Facility/FacilityScreen";
+import BoardScreen from "./screens/Board/BoardScreen";
+import UploadScreen from "./screens/Board/UploadScreen";
+import CameraScreen from "./screens/Board/CameraScreen";
 
 import { AuthProvider, useAuth } from "./AuthContext";
 
@@ -61,7 +63,7 @@ export default function App() {
           }}
         >
           <Tab.Screen
-            name="공원"
+            name="Main"
             initialRouteName="Main"
             options={{
               headerShown: false,
@@ -75,26 +77,44 @@ export default function App() {
                 <Stack.Screen
                   name="MainPage"
                   component={MainScreen}
-                  // options={{ headerShown: false }}
+                  options={{ headerShown: false }}
                 />
                 <Stack.Screen
                   name="Facility"
                   component={FacilityScreen}
-                  // options={{ headerShown: false }}
+                  options={{ headerShown: false }}
                 />
               </Stack.Navigator>
             )}
           </Tab.Screen>
           <Tab.Screen
             name="스토리"
-            component={StoryScreen}
             options={{
-              headerShown: false,
               tabBarIcon: ({ focused }) => (
                 <TabBarIcon focused={focused} iconName="카메라" />
               ),
             }}
-          />
+          >
+            {() => (
+              <Stack.Navigator>
+                <Stack.Screen
+                  name="Board"
+                  component={BoardScreen}
+                  // options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="Upload"
+                  component={UploadScreen}
+                  // options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                  name="Camera"
+                  component={CameraScreen}
+                  // options={{ headerShown: false }}
+                />
+              </Stack.Navigator>
+            )}
+          </Tab.Screen>
           <Tab.Screen
             name="키우기"
             component={DogScreen}
@@ -118,7 +138,6 @@ export default function App() {
           <Tab.Screen
             name="내 정보"
             options={{
-              // headerShown: false,
               tabBarIcon: ({ focused }) => (
                 <TabBarIcon focused={focused} iconName="마이" />
               ),
@@ -126,30 +145,16 @@ export default function App() {
           >
             {() => (
               <Stack.Navigator>
-                <Stack.Screen
-                  name="MyPage"
-                  component={MyPageScreen}
-                  // options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                  name="Login"
-                  component={LoginScreen}
-                  // options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                  name="Signup"
-                  component={SignupScreen}
-                  // options={{ headerShown: false }}
-                />
+                <Stack.Screen name="MyPage" component={MyPageScreen} />
+                <Stack.Screen name="Login" component={LoginScreen} />
+                <Stack.Screen name="Signup" component={SignupScreen} />
                 <Stack.Screen
                   name="LoggedInMyPage"
                   component={LoggedInMyPage}
-                  // options={{ headerShown: false }}
                 />
                 <Stack.Screen
                   name="LoggedOutMyPage"
                   component={LoggedOutMyPage}
-                  // options={{ headerShown: false }}
                 />
               </Stack.Navigator>
             )}

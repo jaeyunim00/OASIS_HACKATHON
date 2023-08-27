@@ -2,6 +2,7 @@ import React from "react";
 import { View, StyleSheet, Text, TouchableOpacity, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useAuth } from "../../AuthContext";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 const MenuItem = ({ title, onPress }) => {
   return (
@@ -19,32 +20,78 @@ const LoggedInMyPage = () => {
     navigation.navigate("Settings");
   };
 
+  console.log(isLoggedIn);
+
   return (
     <View style={styles.container}>
-      {/* 프로필 박스 */}
-      <View style={styles.profileBox}>
-        <TouchableOpacity
-          style={styles.settingsButton}
-          onPress={handleSettingsPress}
-        >
-          <Text style={styles.settingsButtonText}>Settings</Text>
-        </TouchableOpacity>
-        <Image
-          source={require("../../assets/tabBar/게시판.png")}
-          style={styles.profileImage}
-        />
-        <Text style={styles.username}>
-          {isLoggedIn ? userEmail : "로그인 안됨"}
-        </Text>
-        <Text style={styles.points}>250 Points</Text>
+      <View style={styles.my_info}>
+        <View style={styles.info_lv1}>
+          <Text style={styles.info_text}>마이페이지</Text>
+          <Icon name="gear" size={20} style={{ color: "#487548" }} />
+        </View>
+        <View style={styles.info_lv2}>
+          <Image
+            source={require("../../assets/profile1.png")}
+            style={{
+              width: 150,
+              height: 150,
+              borderRadius: 75,
+            }}
+          />
+        </View>
+        <View style={styles.info_lv3}>
+          <Text style={styles.info_text}>[닉네임]</Text>
+        </View>
+        <View style={styles.info_lv4}>
+          <Text style={[styles.info_text, styles.info_deco_point]}>
+            내 포인트 [포인트]p
+          </Text>
+        </View>
       </View>
-      <View style={styles.menuBox}>
-        <MenuItem title="알림 설정" />
-        <MenuItem title="평가 관리" />
-        <MenuItem title="포인트" />
-        <MenuItem title="내가 쓴 글/댓글" />
-        <MenuItem title="고객 센터" />
-        <MenuItem title="로그아웃" onPress={handleLoggedout} />
+      <View style={styles.split_box}></View>
+      <View style={styles.my_navi}>
+        <View style={styles.navi_row}>
+          <Icon
+            name="bell"
+            size={20}
+            style={{ marginRight: 10, color: "#487548", marginRight: 10 }}
+          />
+          <Text>알림설정</Text>
+        </View>
+        <View style={styles.navi_row}>
+          <Icon
+            name="paw"
+            size={20}
+            style={{ marginRight: 10, color: "#487548" }}
+          />
+          <Text>평가 관리</Text>
+        </View>
+        <View style={styles.navi_row}>
+          <Icon
+            name="tree"
+            size={20}
+            style={{ marginRight: 10, color: "#487548" }}
+          />
+          <Text>포인트</Text>
+        </View>
+        <View style={styles.navi_row}>
+          <Icon
+            name="clipboard"
+            size={20}
+            style={{ marginRight: 10, color: "#487548" }}
+          />
+          <Text>내가 쓴 글</Text>
+        </View>
+      </View>
+      <View>
+        <View style={styles.navi_row}>
+          <Icon
+            name="phone"
+            size={20}
+            style={{ marginRight: 10, color: "#487548" }}
+          />
+          <Text>고객센터</Text>
+        </View>
       </View>
     </View>
   );
@@ -54,17 +101,48 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
-    padding: 20,
+    padding: 10,
+    color: "#487548",
   },
-  // ... 다른 스타일들
-  menuItem: {
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0",
+  my_info: {},
+  info_text: {
+    color: "#487548",
+    fontWeight: "bold",
   },
-  menuItemText: {
-    fontSize: 16,
-    color: "#333333",
+  info_deco_point: {
+    backgroundColor: "yellow",
+    padding: 10,
+  },
+  info_lv1: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    padding: 10,
+  },
+  info_lv2: {
+    alignItems: "center",
+    padding: 10,
+  },
+  info_lv3: {
+    alignItems: "center",
+    padding: 10,
+  },
+  info_lv4: {
+    alignItems: "center",
+    padding: 10,
+    backgroundColor: "",
+  },
+  split_box: {
+    width: "100%",
+    height: 5,
+    backgroundColor: "#487548",
+  },
+  navi_row: {
+    flexDirection: "row",
+    paddingTop: 15,
+    paddingBottom: 15,
+    borderBottomWidth: 1, // 1px border
+    borderBottomColor: "#487548", // red color
+    alignItems: "center",
   },
 });
 

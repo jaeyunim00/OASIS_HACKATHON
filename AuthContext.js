@@ -6,6 +6,7 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userEmail, setUserEmail] = useState(null);
+  const [userPoints, setUserPoints] = useState(0);
 
   const navigation = useNavigation(); // 네비게이션 객체 가져오기
 
@@ -13,12 +14,23 @@ export const AuthProvider = ({ children }) => {
     // 로그인 처리 로직
     setIsLoggedIn(true);
     setUserEmail(email);
+    setUserPoints(points);
+  };
+
+  const handleUserPoint = () => {
+    setUserPoints((x) => x + 10);
+  };
+
+  const handleUserPoint_reset = () => {
+    setUserPoints(0);
   };
 
   const handleLoggedout = () => {
     // 로그아웃 처리 로직
     setIsLoggedIn(false);
     setUserEmail(null);
+    setUserPoints(0);
+    setUserUid(null);
   };
 
   const handleLoginScreenPress = () => {
@@ -35,6 +47,9 @@ export const AuthProvider = ({ children }) => {
         handleLoggedin,
         handleLoggedout,
         handleLoginScreenPress,
+        userPoints,
+        handleUserPoint,
+        handleUserPoint_reset,
       }}
     >
       {children}

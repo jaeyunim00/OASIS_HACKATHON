@@ -6,39 +6,60 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  RefreshControl,
 } from "react-native";
 import { storage, ref, getDownloadURL, listAll } from "../../firebaseConfig";
 
+import { useNavigation } from "@react-navigation/native";
+
 const BoardScreen = () => {
+  const navigation = useNavigation();
   const [imageUrls, setImageUrls] = useState([]);
+  const [refreshing, setRefreshing] = useState(false); // refreshing 상태 추가
+
+  const fetchImageUrls = async () => {
+    try {
+      const storageRef = ref(storage, "images"); // images 폴더 경로
+      const fileList = await listAll(storageRef);
+
+      const urls = await Promise.all(
+        fileList.items.map(async (item) => {
+          const url = await getDownloadURL(item);
+          return url;
+        })
+      );
+
+      setImageUrls(urls);
+    } catch (error) {
+      console.error("Error fetching image URLs from Firebase Storage:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchImageUrls = async () => {
-      try {
-        const storageRef = ref(storage, "images"); // images 폴더 경로
-        const fileList = await listAll(storageRef);
-
-        const urls = await Promise.all(
-          fileList.items.map(async (item) => {
-            const url = await getDownloadURL(item);
-            return url;
-          })
-        );
-
-        setImageUrls(urls);
-      } catch (error) {
-        console.error(
-          "Error fetching image URLs from Firebase Storage:",
-          error
-        );
-      }
-    };
-
     fetchImageUrls();
   }, []);
 
+  const handleUploadPress = () => {
+    // Navigate to the UploadScreen
+    navigation.navigate("Upload");
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true); // 새로고침 시작
+    fetchImageUrls();
+    setRefreshing(false); // 새로고침 종료
+  };
+
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
+      <TouchableOpacity style={styles.uploadButton} onPress={handleUploadPress}>
+        <Text style={styles.uploadButtonText}>업로드</Text>
+      </TouchableOpacity>
       {imageUrls.map((url, index) => (
         <View style={styles.postContainer} key={index}>
           <View style={styles.header}>

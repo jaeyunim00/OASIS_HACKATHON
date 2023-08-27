@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { FirebaseStorage } from "firebase/storage";
+import { db } from "../firebaseConfig";
 
 function ComplainScreen() {
   return (

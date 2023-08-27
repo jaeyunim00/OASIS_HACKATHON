@@ -8,12 +8,12 @@ function FacilityScreen() {
   const facilities = [1, 2, 3, 4, 5, 6];
 
   return (
-    <View style={styles.page}>
+    <View key={"fac"} style={styles.page}>
       <Text style={styles.title}>공원 주변 시설</Text>
       <ScrollView style={styles.list}>
-        {facilities.map((x) => {
+        {facilities.map((x, i) => {
           return (
-            <View style={styles.item}>
+            <View style={styles.item} key={i}>
               <Text style={styles.item_image}>시설{x}</Text>
               <View style={styles.item_detail}>
                 <Text>시설이름{x}</Text>

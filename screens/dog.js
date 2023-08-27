@@ -3,46 +3,19 @@ import { View, Text, Image, StyleSheet, Button } from "react-native";
 import { getFirestore, collection, getDocs } from "@firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { db, auth } from "../firebaseConfig";
+import { getDoc, doc } from "firebase/firestore";
+import { useAuth } from "../AuthContext";
 
 function DogScreen() {
-  const [level, setLevel] = useState(1);
-  const [experience, setExperience] = useState(0);
   const maxExperience = 100; // 최대 경험치 값
-  const [user, setUser] = useState(null);
-
-  const [exp, setExp] = useState([]);
-
-  const handleLevelUp = () => {
-    // 레벨 업 함수
-    setLevel(level + 1);
-  };
-
-  const fetchDogs = async () => {
-    const dogCollectionRef = collection(db, "users");
-    const querySnapshot = await getDocs(dogCollectionRef);
-
-    const dogList = [];
-    querySnapshot.forEach((doc) => {
-      dogList.push({ id: doc.id, ...doc.data() });
-    });
-
-    setExp(dogList);
-  };
-
-  useEffect(() => {
-    fetchDogs();
-  }, []);
-
-  console.log(exp);
-
-  const handleReset = () => {
-    setLevel(1);
-  };
+  const { isLoggedIn, userPoints, handleUserPoint, handleUserPoint_reset } =
+    useAuth();
 
   let imageSource;
-  if (level === 1) {
+
+  if (userPoints < 100) {
     imageSource = require("../assets/dog_data/level1.png"); // 각 레벨에 따른 이미지 경로 설정
-  } else if (level === 2) {
+  } else if (userPoints < 200) {
     imageSource = require("../assets/dog_data/level2.png");
   }
 
@@ -54,22 +27,28 @@ function DogScreen() {
           style={styles.image}
         />
       </View>
-      <View style={styles.textContainer}>
-        <View style={styles.textContainer}>
-          <Text>Current Level: {level}</Text>
-          <View style={styles.experienceBar}>
-            <View
-              style={{
-                width: `${(experience / maxExperience) * 100}%`,
-                backgroundColor: "#4caf50", // 경험치 바 채워지는 부분의 배경색
-                height: "100%",
-              }}
-            ></View>
+      <Text>User is logged in: {isLoggedIn ? "Yes" : "No"}</Text>
+      {isLoggedIn ? (
+        <>
+          <View style={{ alignItems: "center" }}>
+            <View style={styles.progressContainer}>
+              <View style={[styles.progressBar, { width: `${userPoints}%` }]} />
+              <Text style={styles.text}>
+                {userPoints % 100} / {maxExperience}
+              </Text>
+            </View>
           </View>
-          <Button title="Level Up" onPress={handleLevelUp} />
-          <Button title="Reset" onPress={handleReset} />
-        </View>
-      </View>
+          <View style={styles.textContainer}>
+            <View style={styles.textContainer}>
+              <Text>Current Level: {userPoints / 100}</Text>
+              <Button title="Exp Up" onPress={handleUserPoint} />
+              <Button title="Reset" onPress={handleUserPoint_reset} />
+            </View>
+          </View>
+        </>
+      ) : (
+        <Text>로그인 후 키워</Text>
+      )}
     </View>
   );
 }
@@ -93,17 +72,24 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  experienceBar: {
-    width: "80%", // 경험치 바 전체 너비
-    height: 50,
-    backgroundColor: "black",
-    borderRadius: 10,
-    marginTop: 10,
+  progressContainer: {
+    width: "80%",
+    height: 30,
+    backgroundColor: "#ccc",
+    borderRadius: 15,
     overflow: "hidden",
+    justifyContent: "center",
   },
-  experienceFill: {
+  progressBar: {
     height: "100%",
-    backgroundColor: "#4caf50", // 경험치 채워지는 부분의 배경색
+
+    backgroundColor: "blue",
+  },
+  text: {
+    alignSelf: "center",
+    position: "absolute",
+    fontWeight: "bold",
+    color: "white",
   },
 });
 
