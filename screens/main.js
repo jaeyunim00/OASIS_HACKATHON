@@ -140,11 +140,6 @@ function MainScreen() {
     setPopupVisible(true);
   };
 
-  const handleFacility = () => {
-    setPopupVisible(false);
-    navigation.navigate("Facility");
-  };
-
   return (
     <View style={{ flex: 1 }}>
       {initialRegion && (
@@ -274,9 +269,6 @@ function MainScreen() {
                           style={{ marginRight: 5 }}
                         />
                         <Text style={styles.hyperlinkText}>자세히</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity onPress={handleFacility}>
-                        <Text style={styles.hyperlinkText}>주변시설정보</Text>
                       </TouchableOpacity>
                     </View>
                     {/* Add other park information as needed */}

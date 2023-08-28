@@ -17,6 +17,10 @@ import BoardScreen from "./screens/Board/BoardScreen";
 import UploadScreen from "./screens/Board/UploadScreen";
 import CameraScreen from "./screens/Board/CameraScreen";
 
+import Best_user from "./screens/Complain/best_user";
+import Cctv from "./screens/Complain/cctv";
+import Complain_fac from "./screens/Complain/complain_fac";
+
 import { AuthProvider, useAuth } from "./AuthContext";
 
 const Tab = createBottomTabNavigator();
@@ -116,8 +120,8 @@ export default function App() {
             )}
           </Tab.Screen>
           <Tab.Screen
-            name="키우기"
-            component={DogScreen}
+            name="추천시설"
+            component={FacilityScreen}
             options={{
               headerShown: false,
               tabBarIcon: ({ focused }) => (
@@ -127,17 +131,43 @@ export default function App() {
           />
           <Tab.Screen
             name="민원"
-            component={ComplainScreen}
             options={{
               headerShown: false,
               tabBarIcon: ({ focused }) => (
                 <TabBarIcon focused={focused} iconName="게시판" />
               ),
             }}
-          />
+          >
+            {() => (
+              <Stack.Navigator>
+                <Stack.Screen
+                  name="complain_fac"
+                  component={Complain_fac}
+                  options={{
+                    headerTitle: "민원 화면", // 네비게이션 바 타이틀
+                  }}
+                />
+                <Stack.Screen
+                  name="cctv"
+                  component={Cctv}
+                  options={{
+                    headerTitle: "CCTV 화면", // 네비게이션 바 타이틀
+                  }}
+                />
+                <Stack.Screen
+                  name="best_user"
+                  component={Best_user}
+                  options={{
+                    headerTitle: "베스트 유저 화면", // 네비게이션 바 타이틀
+                  }}
+                />
+              </Stack.Navigator>
+            )}
+          </Tab.Screen>
           <Tab.Screen
             name="내 정보"
             options={{
+              headerShown: false,
               tabBarIcon: ({ focused }) => (
                 <TabBarIcon focused={focused} iconName="마이" />
               ),

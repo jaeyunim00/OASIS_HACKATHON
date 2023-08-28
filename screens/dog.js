@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Image, StyleSheet, Button } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  Button,
+  ImageBackground,
+  ScrollView,
+} from "react-native";
 import { getFirestore, collection, getDocs } from "@firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { db, auth } from "../firebaseConfig";
@@ -11,6 +19,7 @@ function DogScreen() {
   const { isLoggedIn, userPoints, handleUserPoint, handleUserPoint_reset } =
     useAuth();
 
+  const facilities = [1, 2, 3, 4, 5, 6];
   let imageSource;
 
   if (userPoints < 100) {
@@ -21,14 +30,38 @@ function DogScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.imageContainer}>
+      <View
+        style={{ height: 50, width: "100%", backgroundColor: "red" }}
+      ></View>
+      {isLoggedIn ? (
+        <View style={{ alignItems: "center" }}>
+          <View style={styles.progressContainer}>
+            <View style={[styles.progressBar, { width: `${userPoints}%` }]} />
+            <Text style={styles.text}>
+              {userPoints % 100} / {maxExperience}
+            </Text>
+          </View>
+        </View>
+      ) : (
+        <Text style={{ heihgt: 30 }}>로그인 후 이용하세요</Text>
+      )}
+      <ImageBackground
+        source={require("../assets/point_background.jpeg")}
+        style={{
+          width: 300,
+          height: 300,
+          justifyContent: "center",
+          alignItems: "center",
+          borderRadius: 150,
+          overflow: "hidden",
+        }}
+      >
         <Image
           source={imageSource} // 이미지 경로를 적절히 수정해주세요
           style={styles.image}
         />
-      </View>
-      <Text>User is logged in: {isLoggedIn ? "Yes" : "No"}</Text>
-      {isLoggedIn ? (
+      </ImageBackground>
+      {/* {isLoggedIn ? ( 이거 exp up 하는 테스트임.
         <>
           <View style={{ alignItems: "center" }}>
             <View style={styles.progressContainer}>
@@ -48,7 +81,23 @@ function DogScreen() {
         </>
       ) : (
         <Text>로그인 후 키워</Text>
-      )}
+      )} */}
+      <View key={"fac"} style={styles.page}>
+        <Text style={styles.title}>공원 주변 시설</Text>
+        <ScrollView style={styles.list}>
+          {facilities.map((x, i) => {
+            return (
+              <View style={styles.item} key={i}>
+                <Text style={styles.item_image}>시설{x}</Text>
+                <View style={styles.item_detail}>
+                  <Text>시설이름{x}</Text>
+                  <Text>시설정보{x}</Text>
+                </View>
+              </View>
+            );
+          })}
+        </ScrollView>
+      </View>
     </View>
   );
 }
@@ -56,16 +105,11 @@ function DogScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  imageContainer: {
-    flex: 0.6, // 60%를 차지하도록 설정
-    justifyContent: "center",
     alignItems: "center",
   },
   image: {
-    width: "60%",
-    height: "60%",
-    resizeMode: "cover",
+    width: 100,
+    height: 100,
   },
   textContainer: {
     flex: 0.4, // 남은 40%를 차지하도록 설정
@@ -75,10 +119,12 @@ const styles = StyleSheet.create({
   progressContainer: {
     width: "80%",
     height: 30,
+    width: 200,
     backgroundColor: "#ccc",
     borderRadius: 15,
     overflow: "hidden",
     justifyContent: "center",
+    marginBottom: 20,
   },
   progressBar: {
     height: "100%",
@@ -90,6 +136,32 @@ const styles = StyleSheet.create({
     position: "absolute",
     fontWeight: "bold",
     color: "white",
+  },
+  page: {
+    flex: 1,
+    backgroundColor: "yellow",
+    padding: 10,
+  },
+  title: {
+    padding: 20,
+    fontSize: 30,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  list: {
+    backgroundColor: "white",
+    flex: 1,
+  },
+  item: {
+    backgroundColor: "orange",
+    padding: 30,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  item_image: {
+    backgroundColor: "gray",
+    padding: 20,
+    marginRight: 20,
   },
 });
 

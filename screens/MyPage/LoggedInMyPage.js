@@ -14,8 +14,15 @@ const MenuItem = ({ title, onPress }) => {
 
 const LoggedInMyPage = () => {
   const navigation = useNavigation();
-  const { isLoggedIn, handleLoggedout, userEmail } = useAuth();
-
+  const {
+    isLoggedIn,
+    handleLoggedout,
+    userEmail,
+    userPoints,
+    handleUserPoint,
+    handleUserPoint_reset,
+  } = useAuth();
+  const maxExperience = 100; // 최대 경험치 값
   const handleSettingsPress = () => {
     navigation.navigate("Settings");
   };
@@ -40,13 +47,20 @@ const LoggedInMyPage = () => {
           />
         </View>
         <View style={styles.info_lv3}>
-          <Text style={styles.info_text}>[닉네임]</Text>
+          <Text style={styles.info_text}>{userEmail}</Text>
         </View>
-        <View style={styles.info_lv4}>
-          <Text style={[styles.info_text, styles.info_deco_point]}>
-            내 포인트 [포인트]p
-          </Text>
-        </View>
+        {isLoggedIn ? (
+          <View style={{ alignItems: "center" }}>
+            <View style={styles.progressContainer}>
+              <View style={[styles.progressBar, { width: `${userPoints}%` }]} />
+              <Text style={styles.text}>
+                {userPoints % 100} / {maxExperience}
+              </Text>
+            </View>
+          </View>
+        ) : (
+          <Text style={{ heihgt: 30 }}>로그인 후 이용하세요</Text>
+        )}
       </View>
       <View style={styles.split_box}></View>
       <View style={styles.my_navi}>
@@ -91,6 +105,16 @@ const LoggedInMyPage = () => {
             style={{ marginRight: 10, color: "#487548" }}
           />
           <Text>고객센터</Text>
+        </View>
+      </View>
+      <View>
+        <View style={styles.navi_row}>
+          <Icon
+            name="check"
+            size={20}
+            style={{ marginRight: 10, color: "#487548" }}
+          />
+          <Text onPress={handleLoggedout}>로그아웃</Text>
         </View>
       </View>
     </View>
@@ -143,6 +167,26 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1, // 1px border
     borderBottomColor: "#487548", // red color
     alignItems: "center",
+  },
+  progressContainer: {
+    width: "80%",
+    height: 30,
+    width: 200,
+    backgroundColor: "#ccc",
+    borderRadius: 15,
+    overflow: "hidden",
+    justifyContent: "center",
+    marginBottom: 20,
+  },
+  progressBar: {
+    height: "100%",
+    backgroundColor: "blue",
+  },
+  text: {
+    alignSelf: "center",
+    position: "absolute",
+    fontWeight: "bold",
+    color: "white",
   },
 });
 
