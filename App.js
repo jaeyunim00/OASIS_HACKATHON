@@ -144,21 +144,28 @@ export default function App() {
                   name="complain_fac"
                   component={Complain_fac}
                   options={{
-                    headerTitle: "민원 화면", // 네비게이션 바 타이틀
+                    headerTitle: "공원 게시판",
+                    headerStyle: {
+                      height: 200, // 원하는 높이로 설정
+                    },
+                    headerTitleStyle: {
+                      fontSize: 22, // 원하는 글씨 크기로 수정
+                    }, // 네비게이션 바 타이틀
                   }}
                 />
                 <Stack.Screen
                   name="cctv"
                   component={Cctv}
                   options={{
-                    headerTitle: "CCTV 화면", // 네비게이션 바 타이틀
+                    headerTitle: "CCTV", // 네비게이션 바 타이틀
                   }}
                 />
                 <Stack.Screen
                   name="best_user"
                   component={Best_user}
                   options={{
-                    headerTitle: "베스트 유저 화면", // 네비게이션 바 타이틀
+                    headerTitle: "우수 유저",
+                    // 네비게이션 바 타이틀
                   }}
                 />
               </Stack.Navigator>
