@@ -4,7 +4,6 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { TouchableOpacity, Image } from "react-native";
 
-import DogScreen from "./screens/dog";
 import MainScreen from "./screens/main";
 import ComplainScreen from "./screens/complain";
 import MyPageScreen from "./screens/MyPage/MyPageScreen";
@@ -97,6 +96,7 @@ export default function App() {
               tabBarIcon: ({ focused }) => (
                 <TabBarIcon focused={focused} iconName="카메라" />
               ),
+              headerShown: false,
             }}
           >
             {() => (
@@ -104,17 +104,17 @@ export default function App() {
                 <Stack.Screen
                   name="Board"
                   component={BoardScreen}
-                  // options={{ headerShown: false }}
+                  options={{ headerShown: false }}
                 />
                 <Stack.Screen
                   name="Upload"
                   component={UploadScreen}
-                  // options={{ headerShown: false }}
+                  options={{ headerShown: false }}
                 />
                 <Stack.Screen
                   name="Camera"
                   component={CameraScreen}
-                  // options={{ headerShown: false }}
+                  options={{ headerShown: false }}
                 />
               </Stack.Navigator>
             )}
@@ -148,9 +148,7 @@ export default function App() {
                     headerStyle: {
                       height: 200, // 원하는 높이로 설정
                     },
-                    headerTitleStyle: {
-                      fontSize: 22, // 원하는 글씨 크기로 수정
-                    }, // 네비게이션 바 타이틀
+                    headerTitleStyle: {}, // 네비게이션 바 타이틀
                   }}
                 />
                 <Stack.Screen

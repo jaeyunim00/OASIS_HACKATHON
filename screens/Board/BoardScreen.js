@@ -8,31 +8,92 @@ import {
   TouchableOpacity,
   RefreshControl,
 } from "react-native";
-import { storage, ref, getDownloadURL, listAll } from "../../firebaseConfig";
-
+import {
+  storage,
+  stoRef,
+  getDownloadURL,
+  listAll,
+  storeQuery,
+  collection,
+  db,
+  where,
+  getDocs,
+} from "../../firebaseConfig";
+import Swiper from "react-native-swiper"; // react-native-swiper 패키지를 import
+import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
 
 const BoardScreen = () => {
   const navigation = useNavigation();
   const [imageUrls, setImageUrls] = useState([]);
   const [refreshing, setRefreshing] = useState(false); // refreshing 상태 추가
+  const [heartStatus, handleHeartStatus] = useState(false);
+  const [check, setCheck] = useState(false);
+  const [selectedIndexes, setSelectedIndexes] = useState([]);
+  const [checkedIndexes, setCheckedIndexes] = useState([]);
+
+  const handleHeart = (index) => {
+    const isSelected = selectedIndexes.includes(index);
+
+    if (isSelected) {
+      setSelectedIndexes(selectedIndexes.filter((item) => item !== index));
+    } else {
+      setSelectedIndexes([...selectedIndexes, index]);
+    }
+  };
+
+  const handleCheck = (index) => {
+    const isChecked = checkedIndexes.includes(index);
+
+    if (isChecked) {
+      setCheckedIndexes(checkedIndexes.filter((item) => item !== index));
+    } else {
+      setCheckedIndexes([...checkedIndexes, index]);
+    }
+  };
 
   const fetchImageUrls = async () => {
     try {
-      const storageRef = ref(storage, "images"); // images 폴더 경로
+      const storageRef = stoRef(storage, "images");
       const fileList = await listAll(storageRef);
 
-      const urls = await Promise.all(
+      const urlsAndData = await Promise.all(
         fileList.items.map(async (item) => {
           const url = await getDownloadURL(item);
-          return url;
+
+          // Fetch additional data from Firestore based on the image's URL
+          const q = storeQuery(
+            collection(db, "images"),
+            where("imageURL", "==", url)
+          );
+          const querySnapshot = await getDocs(q);
+
+          console.log("Query Snapshot:", querySnapshot); // Add this line
+
+          if (querySnapshot.docs.length === 0) {
+            return {
+              url: url,
+              associatedText: "", // No associated text found for this URL
+            };
+          }
+
+          const data = querySnapshot.docs[0].data();
+
+          return {
+            url: url,
+            associatedText: data ? data.associatedText : "",
+          };
         })
       );
 
-      setImageUrls(urls);
+      setImageUrls(urlsAndData);
     } catch (error) {
       console.error("Error fetching image URLs from Firebase Storage:", error);
     }
+  };
+
+  const toUpload = () => {
+    navigation.navigate("Upload");
   };
 
   useEffect(() => {
@@ -57,33 +118,64 @@ const BoardScreen = () => {
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
-      <TouchableOpacity style={styles.uploadButton} onPress={handleUploadPress}>
-        <Text style={styles.uploadButtonText}>업로드</Text>
-      </TouchableOpacity>
-      {imageUrls.map((url, index) => (
-        <View style={styles.postContainer} key={index}>
-          <View style={styles.header}>
-            <Image
-              source={require("../../assets/tabBar/홈_포커스.png")}
-              style={styles.profileImage}
-            />
-            <Text style={styles.username}>사용자 이름</Text>
+      <View style={{ height: 50 }}></View>
+      <View style={styles.nav_bar}>
+        <Image
+          source={require("../../assets/real_logo.png")}
+          style={{ width: 70, height: 50 }}
+          resizeMode="contain"
+        />
+        <Text onPress={toUpload} style={{ fontSize: 20, color: "#418915" }}>
+          UP
+        </Text>
+      </View>
+      <View style={styles.posts}>
+        {imageUrls.map((item, index) => (
+          <View style={styles.post}>
+            <View style={styles.post_header}>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <View
+                  style={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: 15,
+                    backgroundColor: "yellow",
+                    marginRight: 7,
+                  }}
+                ></View>
+                <Text style={{ fontSize: 17 }}>공원이름</Text>
+              </View>
+              <View>
+                <Icon
+                  name={
+                    checkedIndexes.includes(index)
+                      ? "check-circle"
+                      : "check-circle-o"
+                  }
+                  onPress={() => handleCheck(index)}
+                  size={23}
+                />
+              </View>
+            </View>
+            <View key={index}>
+              <Image source={{ uri: item.url }} style={styles.image} />
+            </View>
+            <View style={styles.post_footer}>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Text style={{ fontSize: 17 }}># 추천공원</Text>
+              </View>
+              <View>
+                <Icon
+                  name="heart"
+                  size={20}
+                  color={selectedIndexes.includes(index) ? "red" : "black"}
+                  onPress={() => handleHeart(index)}
+                />
+              </View>
+            </View>
           </View>
-          {/* Add your Carousel or ImageSlider component here */}
-          <View style={styles.slide}>
-            <Image source={{ uri: url }} style={styles.image} />
-          </View>
-          <View style={styles.actions}>
-            <TouchableOpacity style={styles.actionButton}>
-              <Text style={styles.actionButtonText}>좋아요</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.actionButton}>
-              <Text style={styles.actionButtonText}>공유하기</Text>
-            </TouchableOpacity>
-          </View>
-          <Text style={styles.caption}>이미지 설명 텍스트</Text>
-        </View>
-      ))}
+        ))}
+      </View>
     </ScrollView>
   );
 };
@@ -91,12 +183,33 @@ const BoardScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: "white",
+  },
+  nav_bar: {
+    paddingLeft: 15,
+    paddingRight: 15,
+    paddingBottom: 5,
+    paddingTop: 5,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    borderBottomWidth: 1,
+    borderBottomColor: "#418915",
+    alignItems: "center",
   },
   postContainer: {
     backgroundColor: "white",
     borderRadius: 8,
     marginBottom: 20,
+  },
+  nametext: {
+    fontSize: 14,
+    marginLeft: 17,
+    marginTop: 10,
+  },
+  separator: {
+    borderBottomWidth: 1,
+    borderBottomColor: "#CCCCCC", // 회색 실선의 색상
+    marginVertical: 5, // 상하 여백 조절
   },
   header: {
     flexDirection: "row",
@@ -114,14 +227,22 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   slide: {
+    width: "100%",
+    height: 400,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 8,
   },
   image: {
-    width: 250,
-    height: 250,
-    borderRadius: 8,
+    width: "100%",
+    height: 300,
+  },
+  actionButtonImage: {
+    width: 20,
+    height: 20,
+    marginLeft: 10,
+    marginRight: 20,
+    // 추가적인 스타일링을 적용할 수 있습니다.
   },
   actions: {
     flexDirection: "row",
@@ -136,7 +257,21 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     fontWeight: "bold",
   },
-  caption: {
+  post: {
+    // borderBottomWidth: 1,
+    // borderBottomColor: "#9a9a9a",
+    marginBottom: 25,
+  },
+  post_header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 10,
+  },
+  post_footer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: 10,
   },
 });

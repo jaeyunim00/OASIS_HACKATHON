@@ -66,8 +66,8 @@ function MainScreen() {
         setInitialRegion({
           latitude,
           longitude,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421,
+          latitudeDelta: 0.0422,
+          longitudeDelta: 0.0321,
         });
         setCurrentLocation({ latitude, longitude });
         setLoading(false);
